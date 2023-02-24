@@ -55,7 +55,7 @@
         $flag=0;
         if (!empty($_POST['name']) && !empty ($_POST['email']) && !empty($_POST['add']) && !empty($_POST['phone']))
         {
-            $mang=serialize(
+            $infor=serialize(
                 [
                     "name" => $_POST['name'],
                     "email" => $_POST['email'],
@@ -63,11 +63,11 @@
                     "phone"=> $_POST['phone']
                 ]
                 );
-        $_SESSION["khach_hang"]  = serialize($mang);
-         $flag=1;
+            setcookie("khach_hang",$infor, time() +3600);
+            $flag=1;
         }
     ?>
-    <form id="forml" name="forml" method="post" action="session1.php">
+    <form id="forml" name="forml" method="post" action="cookie.php">
         <div class="center" >
             <h1 class="center1">Thông tin đăng nhập</h1>
         </div>
@@ -91,7 +91,7 @@
     <div >
         <?php 
             if ($flag==1) {
-                $data=unserialize($_SESSION['khach_hang']);
+                $data=unserialize($_COOKIE['khach_hang']);
                 echo "<div class='hienthi'>";
                 echo "<p>Thông tin chi tiết của khách hàng </p>";
                 echo "name: " . $data["name"] . "<br></br> email: " . $data["email"] ."<br></br>" ."phone: " . $data["phone"] . "<br></br>"."address:".$data["add"]."<br></br>"  ;
