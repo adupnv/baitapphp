@@ -1,120 +1,90 @@
 <?php
 
+$name = $phone = $email = $content = "";
+$name_err = $phone_err = $email_err = $content_err = "";
 
-$data = array();
-$errors = array();
+// Kiểm tra nếu form được submit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  
+  if (empty(trim($_POST["name"]))) {
+    $name_err = "Vui lòng nhập tên.";
+  } else {
+    $name = trim($_POST["name"]);
+  }
 
-// Biến kiểm tra có phải action edit hay không
-$is_update_action = false;
+  if (empty(trim($_POST["phone"]))) {
+    $phone_err = "Vui lòng nhập số điện thoại.";
+  } elseif (!preg_match('/^[0-9]{10}$/', $_POST["phone"])) {
+    $phone_err = "Vui lòng nhập đúng 10 số!";
+  } else {
+    $phone = trim($_POST["phone"]);
+  }
 
-// Trường hợp edit thì ta lấy thông tin để show ra cho người dùng thấy
-if (!empty($_GET['id'])) {
-    $data = getStudent($_GET['id']);
-    $is_update_action = true;
+  if (empty(trim($_POST["email"]))) {
+    $email_err = "Vui lòng nhập địa chỉ email.";
+  } else {
+    $email = trim($_POST["email"]);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $email_err = "Địa chỉ email không hợp lệ.";
+    }
+  }
+  
+  if (empty(trim($_POST["content"]))) {
+    $content_err = "Vui lòng nhập nội dung.";     
+  } else {
+    $content = trim($_POST["content"]);
+  }
+
+  if ($name_err == "" && $phone_err == "" && $email_err == "" && $content_err == "") {
+    // nếu không có lỗi, hiển thị form thứ hai
+    $kq = '<div id="form2" style="display: block;">
+        <p>Chào bạn '.$name.'</p>
+        <p>Số điện thoại của bạn là: '.$phone.'</p>
+        <p>Email đăng nhập của bạn là: '.$email.'</p>
+        <p>Nội dung bạn đã gửi cho hệ thống: '.$content.'</p>
+      </div>';
+  }
 }
 
-// Nếu người dùng click vào nút submit
-if (!empty($_POST['add_student'])) {
-
-    // Lấy thông tin
-    $data['name'] = isset($_POST['fullname']) ? $_POST['fullname'] : '';
-    
-    $data['sdt'] = isset($_POST['phon']) ? $_POST['sdt'] : '';
-    $data['email'] = isset($_POST['gmail']) ? $_POST['gmail'] : '';
-    $data['nd'] = isset($_POST['noidung']) ? $_POST['noidung'] : '';
-
-    // Validate
-    if (empty($data['name'])) {
-        $errors['name'] = 'Ban chua nhap ten';
-    }
-    if (empty($data['sdt'])) {
-        $errors['sdt'] = 'Ban chua nhap Số Điện Thoại';
-    }
-    
-    if (empty($data['email'])) {
-        $errors['email'] = 'Ban chua nhap Email';
-    }
-    if (empty($data['nd'])) {
-        $errors['nd'] = 'không để rõng';
-    }
-    if(empty($errors)){
-    
-        redirect('thanhcong');
-    }else{
-        echo 'Không thành công <br/>';
-    }
-
-    //  Nếu dữ liệu hợp lệ thì thực hiện thao tác update thông tin
-    // đồng thời redirect về trang danh sách
-    // if (empty($errors)) {
-    //     updateStudent($data['name'], $data['sdt'], $data['email'], $data['nd'], );
-    //     header("Location:student-list.php");
-    // }
-}
 ?>
+
 
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Thêm sinh viên</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
+  <title>Liên hệ</title>
+  <link rel="stylesheet" href="style.css">
+  
 </head>
-
-<body>
-
-
-    <br> <br>
-    <form method="post">
-        <table border="1" cellspacing="0" cellpadding="10" class="table-hover" align="center">
-           
-            <tr>
-                <td>Họ tên</td>
-                <td>
-                    <input type="text" name="fullname" value="<?php echo !empty($data['name']) ? $data['name'] : ''; ?>" />
-                    <?php echo !empty($errors['name']) ? $errors['name'] : ''; ?>
-                </td>
-            
-                </td>
-            </tr>
-            <tr>
-                <td>Số Điện Thoại</td>
-                <td>
-                    <input type="text" name="phon" value="<?php echo !empty($data['sdt']) ? $data['sdt'] : ''; ?>" />
-                    <?php echo !empty($errors['sdt']) ? $errors['sdt'] : ''; ?>
-                </td>
-                
-                </td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>
-                    <input type="text" name="gmail" value="<?php echo !empty($data['email']) ? $data['email'] : ''; ?>" />
-                    <?php echo !empty($errors['email']) ? $errors['email'] : ''; ?>
-                </td>
-                   
-                </td>
-            </tr>
-          
-           
-            <tr>
-                <td>Nội dung</td>
-                <td>
-                    <input type="tex" name="noidung" value="<?php echo !empty($data['nd']) ? $data['nd'] : ''; ?>" />
-                    <?php echo !empty($errors['nd']) ? $errors['nd'] : ''; ?>
-                </td>
-                
-                </td>
-            </tr>
-             <input type="submit" value="Gởi tin">
-        </table>
-    </form>
-
+<body class="bt1">
+  <h2>Liên hệ</h2>
+  <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+  <table>
+    <tr>
+      <td><input type="text" name="name" value="<?php echo $name; ?>" placeholder="Họ và tên"></td>
+      <td><span><?php echo $name_err; ?></span></td>
+    </tr>
+    <tr>
+      <td><input type="text" name="phone" value="<?php echo $phone; ?>"  placeholder="Điện thoại"></td>
+      <td><span><?php echo $phone_err; ?></span></td>
+    </tr>
+    <tr>
+      <td><input type="text" name="email" value="<?php echo $email; ?>" placeholder="Email"></td>
+      <td><span><?php echo $email_err; ?></span></td>
+    </tr>
+    <tr>
+      <td><textarea id="content" name="content" placeholder="Nội dung" value="<?php echo $content; ?>"></textarea></td>
+      <td><span><?php echo $content_err; ?></span></td>
+    </tr>
+  </table>
+    <button name="submit" type="submit">Gửi tin</button>
+  <div id="form2" style="display: none;">
+  </div>
+  <?php
+  ini_set('display_errors', 0);
+  echo $kq
+  ?>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
